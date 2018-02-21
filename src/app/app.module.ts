@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpModule } from '@angular/http';
 import { NgModule } from '@angular/core';
 
+import { DataService } from './data.service';
 
 import { AppComponent } from './app.component';
 
@@ -18,9 +20,10 @@ import { JapaneseCandlesticksComponent } from './chart-container/japanese-candle
     JapaneseCandlesticksComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpModule
   ],
-  providers: [],
+  providers: [DataService],
   bootstrap: [AppComponent]
 })
 
