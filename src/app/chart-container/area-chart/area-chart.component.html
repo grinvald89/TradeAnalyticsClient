@@ -1,0 +1,11 @@
+<div class="container">
+	<div class="values">
+		<span *ngFor="let item of scaleValues">{{ item }}</span>
+	</div>
+
+	<svg #svg></svg>
+
+	<div class="minutes">
+		<span *ngFor="let item of rates">{{ item.minute }}</span>
+	</div>
+</div>

@@ -4,10 +4,18 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 
+import { ChartContainerComponent } from './chart-container/chart-container.component';
+import { AreaChartComponent } from './chart-container/area-chart/area-chart.component';
+import { JapaneseCandlesticksComponent } from './chart-container/japanese-candlesticks/japanese-candlesticks.component';
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+
+    ChartContainerComponent,
+    AreaChartComponent,
+    JapaneseCandlesticksComponent
   ],
   imports: [
     BrowserModule
@@ -15,4 +23,5 @@ import { AppComponent } from './app.component';
   providers: [],
   bootstrap: [AppComponent]
 })
+
 export class AppModule { }
