@@ -21,10 +21,10 @@ export class DataService {
 			.map(res => res.json() as IPair[]);
 	}
 
-	getRates(take: number, pairid: number, minutes: number, finishdate?: string): Observable<IRate[]> {
+	getRates(take: number, pairid: number, minutes: number, date?: string, isforward?: boolean): Observable<IRate[]> {
 		let options = new RequestOptions({ headers: this.headers });
 
-		return this.http.get(this.url + "getRates/?take=" + take + "&pairid=" + pairid + "&minutes=" + minutes + (finishdate ? "&finishdate=" + finishdate : ""), options)
+		return this.http.get(this.url + "getRates/?take=" + take + "&pairid=" + pairid + "&minutes=" + minutes + (date ? "&date=" + date : "") + (isforward ? "&isforward=true" : ""), options)
 			.map(res => res.json() as IRate[]);
 	}
 }

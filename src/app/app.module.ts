@@ -3,6 +3,7 @@ import { HttpModule } from '@angular/http';
 import { NgModule } from '@angular/core';
 
 import { DataService } from './data.service';
+import { TimeService } from './time.service';
 
 import { AppComponent } from './app.component';
 
@@ -23,7 +24,10 @@ import { JapaneseCandlesticksComponent } from './chart-container/japanese-candle
     BrowserModule,
     HttpModule
   ],
-  providers: [DataService],
+  providers: [
+    DataService,
+    TimeService
+  ],
   bootstrap: [AppComponent]
 })
 

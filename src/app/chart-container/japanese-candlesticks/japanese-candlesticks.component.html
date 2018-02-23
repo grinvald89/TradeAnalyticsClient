@@ -1,11 +1,14 @@
-<div class="container">
-	<div class="values">
-		<span *ngFor="let item of gridValues">{{ item }}</span>
-	</div>
+<div class="container"
+	(mousedown)="onMouseDown($event)"
+	(mouseup)="onMouseUp($event)">
 
-	<svg #svg></svg>
+		<div class="values">
+			<span *ngFor="let item of gridValues">{{ item }}</span>
+		</div>
 
-	<div class="minutes">
-		<span *ngFor="let item of rates">{{ visibleTime(item.Date) }}</span>
-	</div>
+		<svg #svg></svg>
+
+		<div class="minutes">
+			<span *ngFor="let item of rates">{{ visibleTime(item.Date) }}</span>
+		</div>
 </div>

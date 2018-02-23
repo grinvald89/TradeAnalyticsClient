@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { DataService } from '../../data.service';
+import { TimeService } from '../../time.service';
 
 import { IRate } from '../../i-rate';
 
@@ -36,12 +37,17 @@ export class JapaneseCandlesticksComponent implements OnInit {
 	// Максимальное количество знаков после запятой, считается по High
 	digits: number = 0;
 
+	clientX: number = 0;
+
 	extremes = {
 		min: 0,
 		max: 0
 	};
 
-	constructor(private dataService: DataService) { }
+	constructor(
+		private dataService: DataService,
+		private timeService: TimeService
+	) { }
 
 	drawChart(): void {
 		this.setGrid();
@@ -146,15 +152,38 @@ export class JapaneseCandlesticksComponent implements OnInit {
 	visibleTime(DateTime: string): string | void {
 		let day = DateTime.substr(DateTime.search(/^[0-9]{2}./), 2),
 			mounth = DateTime.substr(DateTime.search(/.[0-9]{2}./) + 1, 2),
-			hour = DateTime.substr(DateTime.search(/\s[0-9]{2}:/) + 1, 2),
+			hour = DateTime.substr(DateTime.search(/\s[0-9]{1,2}:/) + 1, 2),
 			minute = DateTime.substr(DateTime.search(/:[0-9]{2}:/) + 1, 2);
 
 		return (parseInt(minute) % (this.timeFrame * 10) === 0) ? day + "/" + mounth + " " + hour + ":" + minute : "";
 	}
 
-	ngOnInit() {
-		this.dataService.getRates(Sizes.take, 1, this.timeFrame)
-			.subscribe(res => {
+	onMouseDown(event) {
+		this.clientX = event.clientX;
+	}
+
+	onMouseUp(event) {
+		let pxShift = event.clientX - this.clientX;
+
+		if(pxShift > 0) {
+			let iShift = Math.floor(pxShift / Sizes.grid.time),
+				startPos = (this.rates.length < (iShift + 1)) ? this.rates[this.rates.length - iShift - 1] : this.rates[0];
+
+			this.getRates(Sizes.take, 1, this.timeFrame, this.timeService.toDateTime(startPos.Date));
+		}
+		else {
+			let iShift = Math.floor((pxShift * -1) / Sizes.grid.time),
+				startPos = this.rates[this.rates.length - 1 - iShift];
+
+			this.getRates(Sizes.take, 1, this.timeFrame, this.timeService.toDateTime(startPos.Date), true);
+		}
+	}
+
+	getRates(take: number, pairid: number, timeFrame: number, date?: string, isforward?: boolean) {
+		this.svg.nativeElement.innerHTML = "";
+
+		this.dataService.getRates(take, pairid, this.timeFrame, date, isforward)
+			.subscribe(res => {				
 				this.digits = 1;
 				res.forEach(item => {
 					let iDot = item.High.toString().indexOf(".");
@@ -163,8 +192,14 @@ export class JapaneseCandlesticksComponent implements OnInit {
 						this.digits = item.High.toString().substr(iDot + 1).length;
 				});
 
-				this.rates = res.reverse();
-				this.drawChart();
+				this.rates = res;
+
+				if (res.length)
+					this.drawChart();
 			});
+	}
+
+	ngOnInit() {
+		this.getRates(Sizes.take, 1, this.timeFrame);
 	}
 }

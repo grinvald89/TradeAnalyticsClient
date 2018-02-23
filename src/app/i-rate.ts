@@ -1,6 +1,6 @@
 export interface IRate {
 	PairId: number;
-	DateTime: string;
+	Date: string;
 	Open: number;
 	Close: number;
 	High: number;
