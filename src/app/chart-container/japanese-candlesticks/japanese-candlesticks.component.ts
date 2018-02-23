@@ -67,9 +67,9 @@ export class JapaneseCandlesticksComponent implements OnInit {
 
 			if (index > 0) {
 				if (this.rates[index - 1].Close <= this.rates[index].Close)
-					color = "green";
+					color = "#2aa76d";
 				else
-					color = "red";
+					color = "#df553a";
 			}
 
 			let body = document.createElementNS("http://www.w3.org/2000/svg", "line");
