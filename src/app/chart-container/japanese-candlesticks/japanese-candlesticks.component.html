@@ -1,14 +1,16 @@
-<div class="container"
-	(mousedown)="onMouseDown($event)"
-	(mouseup)="onMouseUp($event)">
-
+<div class="container" #container>
+	<div #wrap class="wrap">
 		<div class="values">
 			<span *ngFor="let item of gridValues">{{ item }}</span>
 		</div>
 
-		<svg #svg></svg>
+		<div class="chart" #chart>
+			<svg #svg></svg>
+			<svg class="value-grid" #svgGrid></svg>
+		</div>
 
 		<div class="minutes">
 			<span *ngFor="let item of rates">{{ visibleTime(item.Date) }}</span>
 		</div>
+	</div>
 </div>

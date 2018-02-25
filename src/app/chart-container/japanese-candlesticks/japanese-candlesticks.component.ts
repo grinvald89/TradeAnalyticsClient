@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 
 import { DataService } from '../../data.service';
 import { TimeService } from '../../time.service';
@@ -16,7 +16,7 @@ const Sizes = {
 		time: 1835
 	},
 
-	take: 100
+	take: 1000
 }
 
 @Component({
@@ -26,7 +26,11 @@ const Sizes = {
 })
 
 export class JapaneseCandlesticksComponent implements OnInit {
-	@ViewChild('svg') svg;
+	@ViewChild('container') container: ElementRef;
+	@ViewChild('wrap') wrap: ElementRef;
+	@ViewChild('chart') chart: ElementRef;
+	@ViewChild('svg') svg: ElementRef;
+	@ViewChild('svgGrid') svgGrid: ElementRef;
 
 	gridValues: number[] = [];
 	gridTimes: any[] = [];
@@ -42,6 +46,11 @@ export class JapaneseCandlesticksComponent implements OnInit {
 	extremes = {
 		min: 0,
 		max: 0
+	};
+
+	eventChart = {
+		onClick: false,
+		position: undefined
 	};
 
 	constructor(
@@ -65,12 +74,8 @@ export class JapaneseCandlesticksComponent implements OnInit {
 				y2 = item.Open > item.Close ? item.Close : item.Open,
 				color = "#000";
 
-			if (index > 0) {
-				if (this.rates[index - 1].Close <= this.rates[index].Close)
-					color = "#2aa76d";
-				else
-					color = "#df553a";
-			}
+			if (index > 0)
+				color =  (this.rates[index - 1].Close <= this.rates[index].Close) ? "#2aa76d" : "#df553a";
 
 			let body = document.createElementNS("http://www.w3.org/2000/svg", "line");
 			body.setAttribute("x1", (index * Sizes.grid.time).toString());
@@ -94,8 +99,24 @@ export class JapaneseCandlesticksComponent implements OnInit {
 			this.svg.nativeElement.appendChild(shadow);
 		});
 
-		this.svg.nativeElement.setAttribute("width", Sizes.chart.time);
 		this.svg.nativeElement.setAttribute("height", Sizes.chart.value);
+	}
+
+	calcGridValues(min: number, max: number): void {
+		this.gridValues = [];
+
+		const scaleValue = (max - min) / (Sizes.chart.value / Sizes.grid.value);
+
+		let value = max,
+			i = Sizes.chart.value / Sizes.grid.value;
+
+		while(i > 0) {
+			this.gridValues.push(Math.round(value * Math.pow(10, this.digits)) / Math.pow(10, this.digits));
+			value -= scaleValue;
+			i--;
+		}
+
+		this.gridValues.push(min);
 	}
 
 	setGrid(): void {
@@ -128,15 +149,15 @@ export class JapaneseCandlesticksComponent implements OnInit {
 				let newLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
 				newLine.setAttribute("x1", "0");
 				newLine.setAttribute("y1", (i * Sizes.grid.value).toString());
-				newLine.setAttribute("x2", Sizes.chart.time.toString());
+				newLine.setAttribute("x2", (this.rates.length * Sizes.grid.value).toString());
 				newLine.setAttribute("y2", (i * Sizes.grid.value).toString());
 				newLine.setAttribute("stroke", "#000");
 				newLine.setAttribute("stroke-width", "0.1");
 
-				this.svg.nativeElement.appendChild(newLine);
+				this.svgGrid.nativeElement.appendChild(newLine);
 			}
 
-			for (let i = 0; i <= Math.floor(Sizes.chart.time / Sizes.grid.time); i++) {
+			for (let i = 0; i <= Math.floor((this.rates.length * Sizes.grid.value) / Sizes.grid.time); i++) {
 				let newLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
 				newLine.setAttribute("x1", (i * Sizes.grid.time).toString());
 				newLine.setAttribute("y1", Sizes.chart.value.toString());
@@ -158,32 +179,15 @@ export class JapaneseCandlesticksComponent implements OnInit {
 		return (parseInt(minute) % (this.timeFrame * 10) === 0) ? day + "/" + mounth + " " + hour + ":" + minute : "";
 	}
 
-	onMouseDown(event) {
-		this.clientX = event.clientX;
-	}
-
-	onMouseUp(event) {
-		let pxShift = event.clientX - this.clientX;
-
-		if(pxShift > 0) {
-			let iShift = Math.floor(pxShift / Sizes.grid.time),
-				startPos = (this.rates.length < (iShift + 1)) ? this.rates[this.rates.length - iShift - 1] : this.rates[0];
-
-			this.getRates(Sizes.take, 1, this.timeFrame, this.timeService.toDateTime(startPos.Date));
-		}
-		else {
-			let iShift = Math.floor((pxShift * -1) / Sizes.grid.time),
-				startPos = this.rates[this.rates.length - 1 - iShift];
-
-			this.getRates(Sizes.take, 1, this.timeFrame, this.timeService.toDateTime(startPos.Date), true);
-		}
-	}
-
 	getRates(take: number, pairid: number, timeFrame: number, date?: string, isforward?: boolean) {
 		this.svg.nativeElement.innerHTML = "";
 
 		this.dataService.getRates(take, pairid, this.timeFrame, date, isforward)
-			.subscribe(res => {				
+			.subscribe(res => {
+				let width = res.length * Sizes.grid.time;
+				this.svg.nativeElement.style.width = width + "px";
+				this.wrap.nativeElement.style.width = width + "px";
+
 				this.digits = 1;
 				res.forEach(item => {
 					let iDot = item.High.toString().indexOf(".");
@@ -199,7 +203,34 @@ export class JapaneseCandlesticksComponent implements OnInit {
 			});
 	}
 
-	ngOnInit() {
+	ngOnInit(): void {
 		this.getRates(Sizes.take, 1, this.timeFrame);
+
+		this.container.nativeElement.onscroll = event => {
+			let iStart = Math.floor(event.srcElement.scrollLeft / Sizes.grid.time),
+				start = this.rates[iStart],
+				iEnd = Math.floor((event.srcElement.scrollLeft + Sizes.chart.time) / Sizes.grid.time),
+				end = this.rates[iEnd],
+				min = start.Low,
+				max = start.High,
+				gMin = this.extremes.min,
+				gMax = this.extremes.max;
+
+			for (let i = iStart; i <= iEnd; i++) {
+				if (this.rates[i].High > max)
+					max = this.rates[i].High;
+
+				if (this.rates[i].Low < min)
+					min = this.rates[i].Low;
+			}
+
+			let scale = (this.extremes.max - this.extremes.min) / (max - min),
+				rangeY = (max - min) / (gMax - gMin) * Sizes.chart.value,
+				topY = (gMax - max) / (gMax - gMin) * Sizes.chart.value;
+
+			this.svg.nativeElement.style.transform = "scaleY(" + scale + ") translateY(-" + topY + "px)";
+
+			this.calcGridValues(min, max);
+		}
 	}
 }

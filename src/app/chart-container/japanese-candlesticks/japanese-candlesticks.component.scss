@@ -1,5 +1,8 @@
 .container {
-	width: 1920px;
+	overflow-y: hidden;
+	overflow-x: auto;
+	width: 1865px;
+	height: 500px;
 	box-sizing: border-box;
 	padding: 20px;
 
@@ -20,6 +23,22 @@
 			&:first-child { margin-top: 0 }
 
 			&:last-child { margin-bottom: -5px }
+		}
+	}
+
+	.chart {
+		overflow: hidden;
+		width: inherit;
+
+		svg {
+			height: 400px;
+			transform-origin: top;
+
+			&.value-grid {
+				position: absolute;
+				top: 20px;
+				width: 1845px;
+			}
 		}
 	}
 
