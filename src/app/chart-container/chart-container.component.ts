@@ -1,9 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 
 import { DataService } from '../data.service';
 import { TimeService } from '../time.service';
 
 import { IRate } from '../i-rate';
+import { IPair } from '../i-pair';
 
 const Params = {
 	sizes: {
@@ -29,10 +30,11 @@ const Params = {
 	styleUrls: ['./chart-container.component.scss']
 })
 
-export class ChartContainerComponent implements OnInit {
-	_params = Params;
+export class ChartContainerComponent {
+	@Input() ActivePair: IPair;
+	@Input() TimeFrame: number;
 
-	timeFrame: number = 1;
+	_params = Params;
 
 	// Максимальное количество знаков после запятой, для сетки, считается по High
 	digits: number = 0;
@@ -43,6 +45,8 @@ export class ChartContainerComponent implements OnInit {
 	};
 
 	rates: IRate[] = [];
+	pairs: IPair[] = [];
+
 	rateGrid: number[] = [];
 
 	constructor(
@@ -51,7 +55,7 @@ export class ChartContainerComponent implements OnInit {
 	) { }
 
 	getRates(take: number, pairid: number, timeFrame: number, date?: string, isforward?: boolean) {
-		this.dataService.getRates(take, pairid, this.timeFrame, date, isforward)
+		this.dataService.getRates(take, pairid, this.TimeFrame, date, isforward)
 			.subscribe(res => {
 				this.digits = 1;
 				this.extremes.min = res[0].Low,
@@ -91,7 +95,8 @@ export class ChartContainerComponent implements OnInit {
 		this.rateGrid.push(min);
 	}
 
-	ngOnInit() {
-		this.getRates(Params.request.take, 1, this.timeFrame);
+	ngOnChanges(changes: SimpleChanges): void {
+		if ((changes.ActivePair && !changes.ActivePair.firstChange) || changes.TimeFrame && !changes.TimeFrame.firstChange)
+			this.getRates(Params.request.take, this.ActivePair.Id, this.TimeFrame);
 	}
 }

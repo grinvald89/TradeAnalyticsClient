@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 
 @Component({
 	selector: 'app-rate-grid',
@@ -28,9 +28,5 @@ export class RateGridComponent implements OnInit {
 
 			this.svg.nativeElement.appendChild(newLine);
 		}
-	}
-
-	ngOnChanges(changes: SimpleChanges) {
-		console.log(changes);
 	}
 }

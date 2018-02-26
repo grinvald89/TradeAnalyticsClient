@@ -1,0 +1,21 @@
+<div class="dropdown pairs" *ngIf="Pairs.length" [ngClass]="{'visible': visiblePairs}" (click)="visiblePairs=true" (mouseleave)="visiblePairs=false">
+	<header>
+		<span>{{ activePair.Name }}</span>
+		<i>></i>
+	</header>
+
+	<ul *ngIf="visiblePairs">
+		<li *ngFor="let pair of Pairs" (click)="activePair = pair">{{ pair.Name }}</li>
+	</ul>
+</div>
+
+<div class="dropdown time-frames" *ngIf="TimeFrames.length" [ngClass]="{'visible': visibleTime}" (click)="visibleTime=true" (mouseleave)="visibleTime=false">
+	<header>
+		<span>{{ timeFrame }} мин.</span>
+		<i>></i>
+	</header>
+
+	<ul *ngIf="visibleTime">
+		<li *ngFor="let item of TimeFrames" (click)="timeFrame = item">{{ item }} мин.</li>
+	</ul>
+</div>

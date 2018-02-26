@@ -1,0 +1,41 @@
+:host {
+	display: flex;
+	overflow: hidden;
+	padding-top: 20px;
+	height: 30px;
+
+	.dropdown {
+		height: inherit;
+		margin-left: 20px;
+		z-index: 1;
+
+		header {
+			box-sizing: border-box;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 150px;
+			height: inherit;
+			padding: 0 10px;
+			border: 1px solid #ccc;
+
+			i { transform: rotate(90deg)}
+		}
+
+		ul {
+			position: absolute;
+			margin: 0;
+			padding: 6px 8px;
+			border-right: 1px solid #ccc;
+			border-left: 1px solid #ccc;
+			border-bottom: 1px solid #ccc;
+			background-color: #fff;
+
+			li {
+				width: 132px;
+				list-style-type: none;
+				cursor: pointer;
+			}
+		}
+	}
+}

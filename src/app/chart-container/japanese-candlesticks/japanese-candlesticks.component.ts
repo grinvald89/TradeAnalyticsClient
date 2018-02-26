@@ -27,7 +27,6 @@ export class JapaneseCandlesticksComponent implements OnInit {
 	@ViewChild('wrap') wrap: ElementRef;
 	@ViewChild('chart') chart: ElementRef;
 	@ViewChild('svg') svg: ElementRef;
-	@ViewChild('svgGrid') svgGrid: ElementRef;
 
 	constructor(
 		private dataService: DataService,
@@ -78,7 +77,34 @@ export class JapaneseCandlesticksComponent implements OnInit {
 			this.svg.nativeElement.appendChild(shadow);
 		});
 
-		this.CalcRateGrid.emit({min: this.Min, max: this.Max});
+		this.setScale();
+
+		this.container.nativeElement.scrollLeft = this.container.nativeElement.scrollWidth - this.container.nativeElement.offsetWidth;
+	}
+
+	setScale(): void {
+		let iStart = Math.floor(this.container.nativeElement.scrollLeft / this.Grid.width),
+			start = this.Rates[iStart],
+			iEnd = Math.floor((this.container.nativeElement.scrollLeft + this.Chart.width) / this.Grid.width),
+			end = this.Rates[iEnd],
+			min = start.Low,
+			max = start.High;
+
+		for (let i = iStart; i <= iEnd && i < this.Rates.length; i++) {
+			if (this.Rates[i].High > max)
+				max = this.Rates[i].High;
+
+			if (this.Rates[i].Low < min)
+				min = this.Rates[i].Low;
+		}
+
+		let scale = (this.Max - this.Min) / (max - min),
+			rangeY = (max - min) / (this.Max - this.Min) * this.Chart.height,
+			topY = (this.Max - max) / (this.Max - this.Min) * this.Chart.height;
+
+		this.svg.nativeElement.style.transform = "scaleY(" + scale + ") translateY(-" + topY + "px)";
+
+		this.CalcRateGrid.emit({min: min, max: max});
 	}
 
 	setTimeGrid(): void {
@@ -95,44 +121,21 @@ export class JapaneseCandlesticksComponent implements OnInit {
 		}
 	}
 
-	visibleTime(DateTime: string): string | void {
+	visibleTime(DateTime: string, Index: number): string {
 		let day = DateTime.substr(DateTime.search(/^[0-9]{2}./), 2),
 			mounth = DateTime.substr(DateTime.search(/.[0-9]{2}./) + 1, 2),
 			hour = DateTime.substr(DateTime.search(/\s[0-9]{1,2}:/) + 1, 2),
 			minute = DateTime.substr(DateTime.search(/:[0-9]{2}:/) + 1, 2);
 
-		return (parseInt(minute) % (this.TimeFrame * 10) === 0) ? day + "/" + mounth + " " + hour + ":" + minute : "";
+		return (Index % 10 === 0) ? day + "/" + mounth + " " + hour + ":" + minute : "";
 	}
 
 	ngOnInit(): void {
-		this.container.nativeElement.onscroll = event => {
-			let iStart = Math.floor(event.srcElement.scrollLeft / this.Grid.width),
-				start = this.Rates[iStart],
-				iEnd = Math.floor((event.srcElement.scrollLeft + this.Chart.width) / this.Grid.width),
-				end = this.Rates[iEnd],
-				min = start.Low,
-				max = start.High;
-
-			for (let i = iStart; i <= iEnd; i++) {
-				if (this.Rates[i].High > max)
-					max = this.Rates[i].High;
-
-				if (this.Rates[i].Low < min)
-					min = this.Rates[i].Low;
-			}
-
-			let scale = (this.Max - this.Min) / (max - min),
-				rangeY = (max - min) / (this.Max - this.Min) * this.Chart.height,
-				topY = (this.Max - max) / (this.Max - this.Min) * this.Chart.height;
-
-			this.svg.nativeElement.style.transform = "scaleY(" + scale + ") translateY(-" + topY + "px)";
-
-			this.CalcRateGrid.emit({min: min, max: max});
-		}
+		this.container.nativeElement.onscroll = event => this.setScale();
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
-		if (!changes.Rates.firstChange) {
+		if (changes.Rates && !changes.Rates.firstChange) {
 			this.svg.nativeElement.innerHTML = "";
 
 			if (this.Rates.length)

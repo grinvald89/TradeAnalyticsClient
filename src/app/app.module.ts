@@ -11,6 +11,7 @@ import { ChartContainerComponent } from './chart-container/chart-container.compo
 import { AreaChartComponent } from './chart-container/area-chart/area-chart.component';
 import { JapaneseCandlesticksComponent } from './chart-container/japanese-candlesticks/japanese-candlesticks.component';
 import { RateGridComponent } from './chart-container/rate-grid/rate-grid.component';
+import { HeaderComponent } from './header/header.component';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { RateGridComponent } from './chart-container/rate-grid/rate-grid.compone
     ChartContainerComponent,
     AreaChartComponent,
     JapaneseCandlesticksComponent,
-    RateGridComponent
+    RateGridComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

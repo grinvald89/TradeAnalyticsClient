@@ -1,1 +1,11 @@
-<app-chart-container></app-chart-container>
+<app-header
+	[(ActivePair)]="activePair"
+	[Pairs]="pairs"
+	[(TimeFrame)]="timeFrame"
+	[TimeFrames]="timeFrames">
+</app-header>
+
+<app-chart-container
+	[ActivePair]="activePair"
+	[TimeFrame]="timeFrame">
+</app-chart-container>

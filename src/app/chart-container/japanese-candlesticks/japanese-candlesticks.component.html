@@ -5,7 +5,7 @@
 		</div>
 
 		<div class="minutes">
-			<span *ngFor="let item of Rates">{{ visibleTime(item.Date) }}</span>
+			<span *ngFor="let item of Rates; let i = index;">{{ visibleTime(item.Date, i) }}</span>
 		</div>
 	</div>
 </div>
