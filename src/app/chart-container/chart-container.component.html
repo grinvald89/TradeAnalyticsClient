@@ -1,1 +1,19 @@
-<app-japanese-candlesticks></app-japanese-candlesticks>
+<app-japanese-candlesticks
+	[Rates]="rates"
+	[Min]="extremes.min"
+	[Max]="extremes.max"
+	[Digits]="digits"
+	[TimeFrame]="timeFrame"
+
+	[Chart]="_params.sizes.chart"
+	[Grid]="_params.sizes.grid"
+
+	(CalcRateGrid)="calcRateGrid($event.min, $event.max)">
+</app-japanese-candlesticks>
+
+<app-rate-grid
+	[Rates]="rateGrid"
+
+	[Chart]="_params.sizes.chart"
+	[Grid]="_params.sizes.grid">
+</app-rate-grid>

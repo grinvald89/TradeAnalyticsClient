@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { ChartContainerComponent } from './chart-container/chart-container.component';
 import { AreaChartComponent } from './chart-container/area-chart/area-chart.component';
 import { JapaneseCandlesticksComponent } from './chart-container/japanese-candlesticks/japanese-candlesticks.component';
+import { RateGridComponent } from './chart-container/rate-grid/rate-grid.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { JapaneseCandlesticksComponent } from './chart-container/japanese-candle
 
     ChartContainerComponent,
     AreaChartComponent,
-    JapaneseCandlesticksComponent
+    JapaneseCandlesticksComponent,
+    RateGridComponent
   ],
   imports: [
     BrowserModule,

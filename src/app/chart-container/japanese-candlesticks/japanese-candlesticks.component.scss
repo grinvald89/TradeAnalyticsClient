@@ -6,26 +6,6 @@
 	box-sizing: border-box;
 	padding: 20px;
 
-	.values {
-		position: absolute;
-		display: flex;
-		flex-direction: column;
-		right: 20px;
-		width: 30px;
-		height: 400px;
-		justify-content: flex-end;
-
-		span {
-			margin-top: 40px;
-			height: 10px;
-			font-size: 10px;
-
-			&:first-child { margin-top: 0 }
-
-			&:last-child { margin-bottom: -5px }
-		}
-	}
-
 	.chart {
 		overflow: hidden;
 		width: inherit;
@@ -33,12 +13,6 @@
 		svg {
 			height: 400px;
 			transform-origin: top;
-
-			&.value-grid {
-				position: absolute;
-				top: 20px;
-				width: 1845px;
-			}
 		}
 	}
 
